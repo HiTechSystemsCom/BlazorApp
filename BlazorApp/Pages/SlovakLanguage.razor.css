@@ -1,0 +1,71 @@
+﻿.word {
+    width: 500px;
+    /*background: red;*/
+    white-space: pre-wrap !important;
+    white-space: nowrap !important;
+    display: inline-block !important; /*block;*/
+
+    border-radius: 5px;
+    padding: 0 10px 0 10px;
+}
+
+.word-regular {
+    background: white;
+}
+
+.word-correct {
+    background: #32CD32;
+    animation: greenAnimation ease 1s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+.word-incorrect {
+    background: red;
+    animation: redAnimation ease 1s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeInAnimation {
+    0% {
+        /*background: red;*/
+        opacity: 0;
+    }
+
+    100% {
+        /*background: white;*/
+        opacity: 1;
+    }
+}
+
+@keyframes greenAnimation {
+    0% {
+        background: #32CD32;
+        opacity: 1;
+    }
+
+    50% {
+        background: #32CD32;
+        opacity: 1;
+    }
+
+    100% {
+        background: white;
+        opacity: 0;
+    }
+}
+
+@keyframes redAnimation {
+    0% {
+        background: red;
+    }
+
+    50% {
+        background: red;
+    }
+
+    100% {
+        background: white;
+    }
+}
