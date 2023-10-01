@@ -18,21 +18,6 @@
 
 <div style="height: 16px;" />
 
-@* <div class="@wordClass" style="@wordStyle"><h1>@display_word</h1></div> *@
-<div class="@wordClass word" style="@wordStyle"><h1>@((MarkupString)display_word)</h1></div>
-
-<div style="height: 16px;" />
-<button class="btn btn-answer @btnStyle" disabled="@(!showButtons)" @onclick="@(() => ProcessAnswer("i"))">i</button>
-<button class="btn btn-answer @btnStyle" disabled="@(!showButtons)" @onclick="@(() => ProcessAnswer("í"))">í</button>
-<button class="btn btn-answer @btnStyle" disabled="@(!showButtons)" @onclick="@(() => ProcessAnswer("y"))">y</button>
-<button class="btn btn-answer @btnStyle" disabled="@(!showButtons)" @onclick="@(() => ProcessAnswer("ý"))">ý</button>
-
-@* @if (showResetButton)
-{
-    <button class="btn btn-primary" @onclick="@(() => Reset())">Od znova</button>
-} *@
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-<button class="btn btn-danger" @onclick="@(() => Reset())">Reset - od znova</button>
 
 <div style="height: 32px;" />
 <div style="color: #32CD32;">Správne odpovede: @correctAnswers</div>
@@ -41,6 +26,21 @@
 <div style="height: 16px;" />
 <div style="color: dimgray; font-weight: 700;">História odpovedí: @correctAnswers</div>
 @((MarkupString)GetAnswers())
+
+
+<div class="input-container">
+
+    <div class="@wordClass word" style="@wordStyle"><h1>@((MarkupString)display_word)</h1></div>
+
+    <div style="height: 16px;" />
+    <button class="btn btn-answer @btnStyle" hidden="@(!showButtons)" @onclick="@(() => ProcessAnswer("i"))">i</button>
+    <button class="btn btn-answer @btnStyle" hidden="@(!showButtons)" @onclick="@(() => ProcessAnswer("í"))">í</button>
+    <button class="btn btn-answer @btnStyle" hidden="@(!showButtons)" @onclick="@(() => ProcessAnswer("y"))">y</button>
+    <button class="btn btn-answer @btnStyle" hidden="@(!showButtons)" @onclick="@(() => ProcessAnswer("ý"))">ý</button>
+
+    <button class="btn btn-answer btn-danger" hidden="@(!showResetButton)" @onclick="@(() => Reset())">Reset - od znova</button>
+
+</div>
 
 
 @code {
@@ -197,11 +197,13 @@
         if (index < wordsList.Count - 1)
         {
             index++;
-            display_word = GetWord();
+            display_word = GetUnderlinedWord();
         }
         else
         {
             // index = 0;
+            display_word = "Koniec";
+
             showButtons = false;
             showResetButton = true;
         }
@@ -219,13 +221,13 @@
         showButtons = true;
         showResetButton = false;
 
-        display_word = GetWord();
+        display_word = GetUnderlinedWord();
 
         StateHasChanged();
     }
 
 
-    private string GetWord()
+    private string GetUnderlinedWord()
     {
         if (index <= wordsList.Count - 1)
         {
