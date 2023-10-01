@@ -22,10 +22,10 @@
 <div class="@wordClass word" style="@wordStyle"><h1>@((MarkupString)display_word)</h1></div>
 
 <div style="height: 16px;" />
-<button class="btn btn-lg @btnStyle" disabled="@(!showButtons)" style="width: 50px;" @onclick="@(() => ProcessAnswer("i"))">i</button>
-<button class="btn btn-lg @btnStyle" disabled="@(!showButtons)" style="width: 50px;" @onclick="@(() => ProcessAnswer("í"))">í</button>
-<button class="btn btn-lg @btnStyle" disabled="@(!showButtons)" style="width: 50px;" @onclick="@(() => ProcessAnswer("y"))">y</button>
-<button class="btn btn-lg @btnStyle" disabled="@(!showButtons)" style="width: 50px;" @onclick="@(() => ProcessAnswer("ý"))">ý</button>
+<button class="btn btn-answer @btnStyle" disabled="@(!showButtons)" @onclick="@(() => ProcessAnswer("i"))">i</button>
+<button class="btn btn-answer @btnStyle" disabled="@(!showButtons)" @onclick="@(() => ProcessAnswer("í"))">í</button>
+<button class="btn btn-answer @btnStyle" disabled="@(!showButtons)" @onclick="@(() => ProcessAnswer("y"))">y</button>
+<button class="btn btn-answer @btnStyle" disabled="@(!showButtons)" @onclick="@(() => ProcessAnswer("ý"))">ý</button>
 
 @* @if (showResetButton)
 {

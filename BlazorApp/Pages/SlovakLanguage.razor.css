@@ -1,4 +1,12 @@
-﻿.word {
+﻿.btn-answer {
+    width: 70px;
+    height: 50px;
+    border-radius: 5px;
+    font-size: 25px;
+    padding: 0 0 0 0;
+}
+
+.word {
     /*width: 500px;*/
 
     white-space: pre-wrap !important;
@@ -6,7 +14,7 @@
     display: inline-block !important; /*block;*/
 
     border-radius: 5px;
-    padding: 0 10px 0 10px;
+    padding: 5px 20px 0 20px;
 }
 
 .word-regular {
