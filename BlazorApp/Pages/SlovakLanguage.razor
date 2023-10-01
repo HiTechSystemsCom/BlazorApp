@@ -27,6 +27,9 @@
 <div style="color: dimgray; font-weight: 700;">História odpovedí: @correctAnswers</div>
 @((MarkupString)GetAnswers())
 
+<div class="pager">
+    @(index + 1)/@wordsList.Count
+</div>
 
 <div class="input-container">
 
@@ -38,7 +41,7 @@
     <button class="btn btn-answer @btnStyle[2]" hidden="@(!showButtons)" @onmousedown="@(() => ProcessAnswer(2, "y"))">y</button>
     <button class="btn btn-answer @btnStyle[3]" hidden="@(!showButtons)" @onmousedown="@(() => ProcessAnswer(3, "ý"))">ý</button>
 
-    <button class="btn btn-answer btn-danger" hidden="@(!showResetButton)" @onmousedown="@(() => Reset())">Reset - od znova</button>
+    <button class="btn btn-answer btn-danger" hidden="@(!showResetButton)" @onmousedown="@(() => Reset())">Reštart od znova</button>
 
 </div>
 
