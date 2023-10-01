@@ -30,6 +30,10 @@
     background: #32CD32;
 }
 
+/*.btn-answer:focus {
+    outline: 0 !important;
+}*/
+
 .btn-incorrect {
     background: red;
 }
