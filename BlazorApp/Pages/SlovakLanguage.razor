@@ -4,6 +4,18 @@
 
 <h1>Slovenský jazyk</h1>
 
+<select class="form-control" @onchange="OnSelected">
+
+    @if ((wordsSource is not null) && (wordsSource.Count > 0))
+    {
+        for (int i = 0; i <= wordsSource.Count() - 1; i++)
+        {
+            <option value="@i">Sada @(i+1)</option>
+        }
+    }
+
+</select>
+
 <br><br>
 
 @* <div>
@@ -22,6 +34,13 @@
     <button class="btn btn-primary" @onclick="@(() => ProcessAnswer("y"))">y</button>
     <button class="btn btn-primary" @onclick="@(() => ProcessAnswer("ý"))">ý</button>
 }
+
+@* @if (showResetButton)
+{
+    <button class="btn btn-primary" @onclick="@(() => Reset())">Od znova</button>
+} *@
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+<button class="btn btn-danger" @onclick="@(() => Reset())">Od znova</button>
 
 
 @answer
@@ -57,17 +76,47 @@
     private List<string> wordsList = new();
     private List<WordWithAnswer> answersList = new();
 
+    private int groupIndex = 0;
 
     private string history = "";
 
     private int index = 0;
     private bool showButtons = true;
+    private bool showResetButton = false;
+
+    private List<string> wordsSource = new();
 
 
     protected override void OnInitialized()
     {
+        wordsSource.Add("lyko, lysý, lýtko, lyžica, lyžička, plyn, plyš, plytký, slýchať, pomaly, pomaličky, blýskať sa, blýskavica, blízko, priblížiť sa, vzlykať, zlyhať, vplyv, plytvať, plynúť, lyže, lyžovať sa, lyžiar, lyžovačka, mlyn, mlynár, mlynček, mlynský, dym, lýtko, hymna, týždeň, jaskyňa, kuchyňa, štyri, pekný, dýchať, oddych, dotyk, dotýkať sa, motýľ, tykadlo, dýka, kývať, gymnázium");
+        wordsSource.Add("kino, kinosála, kinofilm, kimono, kikiríkať , kikiriky, chichotať sa, chi-chi, kilo, kilogram, kilometer, milimeter, Hilda, Gizela, Margita, Regína, Olívia, Denisa, Martina, Martin, Editka, Tibor, Justína, Valentín, Timea, Bonifác, Monika, Veronika, Dominika");
+        // 3.) h_kať, h_t, h_tparáda, h_stória, h_storik, h_jó, h_-h_, ch_chotať sa, ch_chúňať sa, ch_chot, t_kať t_k-tak, t_p-top, ch_rurg, ch_rurgia, arch_tekt, arch_v, k_b_covať, k_v_, g_tara, g_gant, log_ka, leg_ny, ang_na, g_tovať, g_rlanda, t_ger, t_tul, kl_ma, l_ter, l_cencia, t_p, t_povať, t_m
+        // 4.) č_tať, č_žmy, poč_tač, dž_p, ž__ci, ž_rafa, cudz_, cudz_nec, vaj_čko, š_pka, uč_ sa, dž_nsy, č_tanka, š_ška, koš_k, záž_tok, ž_vot, ž_hľava, dž_n, š_bal, š_p, paž_tka, oč_, háč_k, ž_hadlo, kruž_dlo, už_točný, palac_nky, c_trón, c_tiť, cudz_, dvoj_ca, prenaj_mať, poc_t, poc_tiť, všetc_, c_sterna, c_cer, medz_, kraj_na, maj_teľ, c_cavec, c_rkus, mam_čka, sestern_ca, hl_na, n_kdy,
+        // 5.) C_ril, C_prián, C_prus, c_kl_st_ka, b_c_kel, c_klámenová farba, klobúk c_linder, c_klón, rec_klovať
+        // 6.) ďatel_na, ťaž_ť, ž_ť, ž_vot, p_šťalka, č_táreň, svadobná s__ň, kn_žka, rod_čia, kn_ha, t_cho, sl_že, bud_k, chodn_k, plesn_vý, d_vadlo, mal_na, mal_novka, kon_k, ul_ca, cuml_k, záhradn_k, l_zať, l_zanka, hod_ny, hod_nár, jašter_ca
+        // 7.) pn_k, ohn_k, dáždn_k, kabát_k, slon_k, stol_k, ž_to, p_jak, kl_nec, det_, klad_vo, lesn_k, vod_čka, studn_čka, v_let, d_ktát, ten_s, ten_ska, ten_stka, krokod_l, matemat_ka, n_kto, pol_cajt, d_nosaurus, d_skutovať, d_sk, krokod_l, pud_ng, džud_sta, d_gestor, d__ptria, d_spečer, n_kel, l_teratúra, l_ga, republ_ka
+        // 8.) chodn_k, kl_nce, koľajn_ce, mot_ľ,  t_cho, prázdn_ny, kol_ska, n_ť, sn_vať, kn_žn_ca, n_kto, st_hnúť, d_vadlo, rod_na, tul_pán, sl_mák, kohút_k, t_cho, t_chý, An_čka, n_ť, rod_na, poh_b, ž_rafa, ž_letka, g_mnast_ka, ch_ba, zoš_t, št_ri, c_buľa
+        // 9.) ch_bajú, kuch_ňa, h_dina, k_vadlo, k_no, k_lometer, g_ps, k_slík, k_logram, mik_na, g_mnázium, ch_ža, poch_tali ich, zak_val, nák_p, brosk_ňa, vyk_nožili, pok_ny, k_priaci prášok, knih_, hrad_, k_jak, h_mna, k_slý, k_snuté cesto, k_tica, ch_tľavá choroba, ch_rurg, mlieko, vyk_pelo, leg_ny, g_tara, g_č, h_stória, poh_b, zah_nul, ch_trý, jask_ňa, k_cha, ch_tačka, japonské k_mono, mag_cké číslo, ch_til
+        // 10.) pomal_čky, l_st, l_stina, prel_stoval, odl_v, pr_liv, zál_v, pol_ca, pol_čka, bl_zko, pribl_žil, hl_na, hl_nený, kl_nec, sl_na, krasl_ca, l_pa, l_pový čaj, metel_ca, brokol_ca, červené l_ca, l_šajník, l_najkový zošit, žehl_čka, ihl_čie, ľad sa bl_ští, č_slo, č_sl_ca, sl_vka, l_sty, kl_nčeky, zabl_slo sa, stojí bl_zko nás, kol_brík, pal_čky, konval_nky
+        // 11 k_blik, g_č, k_slé, nák_p, k_mono, kr_dlo, k_chať, cesto nek_sne, k_slá kapusta, ryžový nák_p,
+
+        OnSelected(new ChangeEventArgs() { Value = "0" } );
+
+    }
+
+    private void OnSelected(ChangeEventArgs e)
+    {
+        if (e.Value is null) return;
+        groupIndex = Int32.Parse(e.Value.ToString());
+
+        answersList.Add(new WordWithAnswer($"Sada: {groupIndex + 1} ================", "=", display_word.IndexOf("_")));
+
+
         // wordsList = new() { "história", "híkať", "lyže", "lýtko" };
-        wordsList = new List<string>(strWords1.Split(", "));
+        wordsList = new List<string>(wordsSource[groupIndex].Split(", "));
+        index = 0;
+        StateHasChanged();
     }
 
     private void ProcessAnswer(string answer)
@@ -77,8 +126,23 @@
         if (index < wordsList.Count - 1)
             index++;
         else
-            index = 0;
-        // showButtons = false;
+        {
+            // index = 0;
+            showButtons = false;
+            showResetButton = true;
+        }
+
+    }
+
+    private void Reset()
+    {
+        // answersList.Add(new WordWithAnswer("================", "=", display_word.IndexOf("_")));
+        answersList.Add(new WordWithAnswer($"Sada: {groupIndex + 1} ================", "=", display_word.IndexOf("_")));
+
+        index = 0;
+        showButtons = true;
+        showResetButton = false;
+        StateHasChanged();
     }
 
 
@@ -142,20 +206,5 @@
 
         return str;
     }
-
-    private string strWords1 = "lyko, lysý, lýtko, lyžica, lyžička, plyn, plyš, plytký, slýchať, pomaly, pomaličky, blýskať sa, blýskavica, blízko, priblížiť sa, vzlykať, zlyhať, vplyv, plytvať, plynúť, lyže, lyžovať sa, lyžiar, lyžovačka, mlyn, mlynár, mlynček, mlynský, dym, lýtko, hymna, týždeň, jaskyňa, kuchyňa, štyri, pekný, dýchať, oddych, dotyk, dotýkať sa, motýľ, tykadlo, dýka, kývať, gymnázium";
-
-
-// 2.) k_no, k_nosála, k_nofilm, k_mono, k_k_ríkať , k_k_riky, ch_chotať sa, ch_-ch_, k_lo, k_logram, k_lometer, m_l_meter, H_lda, G_zela, Marg_ta, Reg_na, Ol_via, Den_sa, Mart_na, Mart_n, Ed_tka, T_bor, Just_na, Valent_n, T_mea, Bon_fác, Mon_ka, Veron_ka, Dom_n_ka
-// 3.) h_kať, h_t, h_tparáda, h_stória, h_storik, h_jó, h_-h_, ch_chotať sa, ch_chúňať sa, ch_chot, t_kať t_k-tak, t_p-top, ch_rurg, ch_rurgia, arch_tekt, arch_v, k_b_covať, k_v_, g_tara, g_gant, log_ka, leg_ny, ang_na, g_tovať, g_rlanda, t_ger, t_tul, kl_ma, l_ter, l_cencia, t_p, t_povať, t_m
-// 4.) č_tať, č_žmy, poč_tač, dž_p, ž__ci, ž_rafa, cudz_, cudz_nec, vaj_čko, š_pka, uč_ sa, dž_nsy, č_tanka, š_ška, koš_k, záž_tok, ž_vot, ž_hľava, dž_n, š_bal, š_p, paž_tka, oč_, háč_k, ž_hadlo, kruž_dlo, už_točný, palac_nky, c_trón, c_tiť, cudz_, dvoj_ca, prenaj_mať, poc_t, poc_tiť, všetc_, c_sterna, c_cer, medz_, kraj_na, maj_teľ, c_cavec, c_rkus, mam_čka, sestern_ca, hl_na, n_kdy,
-// 5.) C_ril, C_prián, C_prus, c_kl_st_ka, b_c_kel, c_klámenová farba, klobúk c_linder, c_klón, rec_klovať
-// 6.) ďatel_na, ťaž_ť, ž_ť, ž_vot, p_šťalka, č_táreň, svadobná s__ň, kn_žka, rod_čia, kn_ha, t_cho, sl_že, bud_k, chodn_k, plesn_vý, d_vadlo, mal_na, mal_novka, kon_k, ul_ca, cuml_k, záhradn_k, l_zať, l_zanka, hod_ny, hod_nár, jašter_ca
-// 7.) pn_k, ohn_k, dáždn_k, kabát_k, slon_k, stol_k, ž_to, p_jak, kl_nec, det_, klad_vo, lesn_k, vod_čka, studn_čka, v_let, d_ktát, ten_s, ten_ska, ten_stka, krokod_l, matemat_ka, n_kto, pol_cajt, d_nosaurus, d_skutovať, d_sk, krokod_l, pud_ng, džud_sta, d_gestor, d__ptria, d_spečer, n_kel, l_teratúra, l_ga, republ_ka
-// 8.) chodn_k, kl_nce, koľajn_ce, mot_ľ,  t_cho, prázdn_ny, kol_ska, n_ť, sn_vať, kn_žn_ca, n_kto, st_hnúť, d_vadlo, rod_na, tul_pán, sl_mák, kohút_k, t_cho, t_chý, An_čka, n_ť, rod_na, poh_b, ž_rafa, ž_letka, g_mnast_ka, ch_ba, zoš_t, št_ri, c_buľa
-// 9.) ch_bajú, kuch_ňa, h_dina, k_vadlo, k_no, k_lometer, g_ps, k_slík, k_logram, mik_na, g_mnázium, ch_ža, poch_tali ich, zak_val, nák_p, brosk_ňa, vyk_nožili, pok_ny, k_priaci prášok, knih_, hrad_, k_jak, h_mna, k_slý, k_snuté cesto, k_tica, ch_tľavá choroba, ch_rurg, mlieko, vyk_pelo, leg_ny, g_tara, g_č, h_stória, poh_b, zah_nul, ch_trý, jask_ňa, k_cha, ch_tačka, japonské k_mono, mag_cké číslo, ch_til
-// 10.) pomal_čky, l_st, l_stina, prel_stoval, odl_v, pr_liv, zál_v, pol_ca, pol_čka, bl_zko, pribl_žil, hl_na, hl_nený, kl_nec, sl_na, krasl_ca, l_pa, l_pový čaj, metel_ca, brokol_ca, červené l_ca, l_šajník, l_najkový zošit, žehl_čka, ihl_čie, ľad sa bl_ští, č_slo, č_sl_ca, sl_vka, l_sty, kl_nčeky, zabl_slo sa, stojí bl_zko nás, kol_brík, pal_čky, konval_nky
-// 11 k_blik, g_č, k_slé, nák_p, k_mono, kr_dlo, k_chať, cesto nek_sne, k_slá kapusta, ryžový nák_p,
-
 
 }
