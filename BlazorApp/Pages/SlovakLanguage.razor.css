@@ -1,6 +1,6 @@
 ﻿.word {
-    width: 500px;
-    /*background: red;*/
+    /*width: 500px;*/
+
     white-space: pre-wrap !important;
     white-space: nowrap !important;
     display: inline-block !important; /*block;*/

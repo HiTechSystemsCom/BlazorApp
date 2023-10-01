@@ -198,7 +198,7 @@
         {
             index++;
             display_word = GetWord();
-    }
+        }
         else
         {
             // index = 0;
@@ -265,7 +265,8 @@
         for (int i = answersList.Count - 1; i >= 0; i--)
         {
             var word = answersList[i];
-            str += @$"<div style=""color: {word.Color};"">{i+1}. {word.Word} {word.Answer}</div>";
+            var style = "";  // word.IsCorrect ? "" : "text-decoration: line-through;";
+            str += @$"<div style=""color: {word.Color};"">{i + 1}. {word.Word} <span style=""{style}"">{word.Answer}</span></div>";
         }
 
         return str;
