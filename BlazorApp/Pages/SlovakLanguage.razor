@@ -16,7 +16,7 @@
 
 </select>
 
-<br><br>
+<div style="height: 16px;" />
 
 @* <div>
     <label for="word">@display_word</label>
@@ -25,37 +25,61 @@
 
 <h1>@display_word</h1>
 
-<br><br>
-
-@if (showButtons)
-{
-    <button class="btn btn-primary" @onclick="@(() => ProcessAnswer("i"))">i</button>
-    <button class="btn btn-primary" @onclick="@(() => ProcessAnswer("í"))">í</button>
-    <button class="btn btn-primary" @onclick="@(() => ProcessAnswer("y"))">y</button>
-    <button class="btn btn-primary" @onclick="@(() => ProcessAnswer("ý"))">ý</button>
-}
+<div style="height: 16px;" />
+<button class="btn @btnStyle" disabled="@(!showButtons)" @onclick="@(() => ProcessAnswer("i"))">i</button>
+<button class="btn @btnStyle" disabled="@(!showButtons)" @onclick="@(() => ProcessAnswer("í"))">í</button>
+<button class="btn @btnStyle" disabled="@(!showButtons)" @onclick="@(() => ProcessAnswer("y"))">y</button>
+<button class="btn @btnStyle" disabled="@(!showButtons)" @onclick="@(() => ProcessAnswer("ý"))">ý</button>
 
 @* @if (showResetButton)
 {
     <button class="btn btn-primary" @onclick="@(() => Reset())">Od znova</button>
 } *@
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-<button class="btn btn-danger" @onclick="@(() => Reset())">Od znova</button>
+<button class="btn btn-danger" @onclick="@(() => Reset())">Reset - od znova</button>
 
+<div style="height: 32px;" />
+<div style="color: #32CD32;">Správne odpovede: @correctAnswers</div>
+<div style="color: red;">Neprávne odpovede: @incorrectAnswers</div>
 
-@answer
-
-<br><br>
+<div style="height: 16px;" />
+<div style="color: dimgray; font-weight: 700;">História odpovedí: @correctAnswers</div>
 @((MarkupString)GetAnswers())
 
 
 @code {
+    private string btnStyle => (showButtons) ? "btn-primary" : "btn-secondary";
 
     private class WordWithAnswer
     {
         public string Word = "";
         public string Answer = "";
         public int Position = 0;
+        public bool IsCorrect
+        {
+            get {
+                bool isCorrect = false;
+
+                if (this.Position < 0)
+                    isCorrect = false;
+                else
+                    isCorrect = (this.Word.Substring(this.Position, 1) == this.Answer);
+
+                return isCorrect;
+            }
+
+        }
+
+        public string Color
+        {
+            get
+            {
+                if (this.IsCorrect)
+                    return "#32CD32";
+                else
+                    return "red";
+            }
+        }
 
         public WordWithAnswer(string word, string answer, int position)
         {
@@ -86,20 +110,23 @@
 
     private List<string> wordsSource = new();
 
+    private int correctAnswers = 0;
+    private int incorrectAnswers = 0;
+
 
     protected override void OnInitialized()
     {
         wordsSource.Add("lyko, lysý, lýtko, lyžica, lyžička, plyn, plyš, plytký, slýchať, pomaly, pomaličky, blýskať sa, blýskavica, blízko, priblížiť sa, vzlykať, zlyhať, vplyv, plytvať, plynúť, lyže, lyžovať sa, lyžiar, lyžovačka, mlyn, mlynár, mlynček, mlynský, dym, lýtko, hymna, týždeň, jaskyňa, kuchyňa, štyri, pekný, dýchať, oddych, dotyk, dotýkať sa, motýľ, tykadlo, dýka, kývať, gymnázium");
         wordsSource.Add("kino, kinosála, kinofilm, kimono, kikiríkať , kikiriky, chichotať sa, chi-chi, kilo, kilogram, kilometer, milimeter, Hilda, Gizela, Margita, Regína, Olívia, Denisa, Martina, Martin, Editka, Tibor, Justína, Valentín, Timea, Bonifác, Monika, Veronika, Dominika");
-        // 3.) h_kať, h_t, h_tparáda, h_stória, h_storik, h_jó, h_-h_, ch_chotať sa, ch_chúňať sa, ch_chot, t_kať t_k-tak, t_p-top, ch_rurg, ch_rurgia, arch_tekt, arch_v, k_b_covať, k_v_, g_tara, g_gant, log_ka, leg_ny, ang_na, g_tovať, g_rlanda, t_ger, t_tul, kl_ma, l_ter, l_cencia, t_p, t_povať, t_m
-        // 4.) č_tať, č_žmy, poč_tač, dž_p, ž__ci, ž_rafa, cudz_, cudz_nec, vaj_čko, š_pka, uč_ sa, dž_nsy, č_tanka, š_ška, koš_k, záž_tok, ž_vot, ž_hľava, dž_n, š_bal, š_p, paž_tka, oč_, háč_k, ž_hadlo, kruž_dlo, už_točný, palac_nky, c_trón, c_tiť, cudz_, dvoj_ca, prenaj_mať, poc_t, poc_tiť, všetc_, c_sterna, c_cer, medz_, kraj_na, maj_teľ, c_cavec, c_rkus, mam_čka, sestern_ca, hl_na, n_kdy,
-        // 5.) C_ril, C_prián, C_prus, c_kl_st_ka, b_c_kel, c_klámenová farba, klobúk c_linder, c_klón, rec_klovať
-        // 6.) ďatel_na, ťaž_ť, ž_ť, ž_vot, p_šťalka, č_táreň, svadobná s__ň, kn_žka, rod_čia, kn_ha, t_cho, sl_že, bud_k, chodn_k, plesn_vý, d_vadlo, mal_na, mal_novka, kon_k, ul_ca, cuml_k, záhradn_k, l_zať, l_zanka, hod_ny, hod_nár, jašter_ca
-        // 7.) pn_k, ohn_k, dáždn_k, kabát_k, slon_k, stol_k, ž_to, p_jak, kl_nec, det_, klad_vo, lesn_k, vod_čka, studn_čka, v_let, d_ktát, ten_s, ten_ska, ten_stka, krokod_l, matemat_ka, n_kto, pol_cajt, d_nosaurus, d_skutovať, d_sk, krokod_l, pud_ng, džud_sta, d_gestor, d__ptria, d_spečer, n_kel, l_teratúra, l_ga, republ_ka
-        // 8.) chodn_k, kl_nce, koľajn_ce, mot_ľ,  t_cho, prázdn_ny, kol_ska, n_ť, sn_vať, kn_žn_ca, n_kto, st_hnúť, d_vadlo, rod_na, tul_pán, sl_mák, kohút_k, t_cho, t_chý, An_čka, n_ť, rod_na, poh_b, ž_rafa, ž_letka, g_mnast_ka, ch_ba, zoš_t, št_ri, c_buľa
-        // 9.) ch_bajú, kuch_ňa, h_dina, k_vadlo, k_no, k_lometer, g_ps, k_slík, k_logram, mik_na, g_mnázium, ch_ža, poch_tali ich, zak_val, nák_p, brosk_ňa, vyk_nožili, pok_ny, k_priaci prášok, knih_, hrad_, k_jak, h_mna, k_slý, k_snuté cesto, k_tica, ch_tľavá choroba, ch_rurg, mlieko, vyk_pelo, leg_ny, g_tara, g_č, h_stória, poh_b, zah_nul, ch_trý, jask_ňa, k_cha, ch_tačka, japonské k_mono, mag_cké číslo, ch_til
-        // 10.) pomal_čky, l_st, l_stina, prel_stoval, odl_v, pr_liv, zál_v, pol_ca, pol_čka, bl_zko, pribl_žil, hl_na, hl_nený, kl_nec, sl_na, krasl_ca, l_pa, l_pový čaj, metel_ca, brokol_ca, červené l_ca, l_šajník, l_najkový zošit, žehl_čka, ihl_čie, ľad sa bl_ští, č_slo, č_sl_ca, sl_vka, l_sty, kl_nčeky, zabl_slo sa, stojí bl_zko nás, kol_brík, pal_čky, konval_nky
-        // 11 k_blik, g_č, k_slé, nák_p, k_mono, kr_dlo, k_chať, cesto nek_sne, k_slá kapusta, ryžový nák_p,
+        wordsSource.Add("híkať, hit, hitparáda, história, historik, hijó, hi-hi, chichotať sa, chichúňať sa, chichot, tikať tik-tak, tip-top, chirurg, chirurgia, architekt, archív, kibicovať, kivi, gitara, gigant, logika, legíny, angína, gitovať, girlanda, tiger, titul, klíma, liter, licencia, tip, tipovať, tím");
+        wordsSource.Add("čítať, čižmy, počítač, džíp, žirafa, cudzí, cudzinec, vajíčko, šípka, učí sa, džínsy, čítanka, šiška, košík, zážitok, život, žihľava, džin, šibal, šíp, pažítka, oči, háčik, žihadlo, kružidlo, užitočný, palacinky, citrón, cítiť, cudzí, dvojica, prenajímať, pocit, pocítiť, všetci, cisterna, cícer, medzi, krajina, majiteľ, cicavec, cirkus, mamička, sesternica, hlina, nikdy");
+        wordsSource.Add("Cyril, Cyprián, Cyprus, cyklistika, bicykel, cyklámenová farba, klobúk cylinder, cyklón, recyklovať");
+        wordsSource.Add("ďatelina, ťažiť, žiť, život, píšťalka, čitáreň, knižka, rodičia, kniha, ticho, slíže, budík, chodník, plesnivý, divadlo, malina, malinovka, koník, ulica, cumlík, záhradník, lízať, lízanka, hodiny, hodinár, jašterica");
+        wordsSource.Add("pník, ohník, dáždnik, kabátik, sloník, stolík, žito, pijak, klinec, deti, kladivo, lesník, vodička, studnička, výlet, diktát, tenis, teniska, tenistka, krokodíl, matematika, nikto, policajt, dinosaurus, diskutovať, disk, krokodíl, puding, džudista, digestor, dispečer, nikel, literatúra, liga, republika");
+        wordsSource.Add("chodník, klince, koľajnice, motýľ,  ticho, prázdniny, kolíska, niť, snívať, knižnica, nikto, stihnúť, divadlo, rodina, tulipán, slimák, kohútik, ticho, tichý, Anička, niť, rodina, pohyb, žirafa, žiletka, gymnastika, chyba, zošit, štyri, cibuľa");
+        wordsSource.Add("chýbajú, kuchyňa, hydina, kyvadlo, kino, kilometer, gyps, kyslík, kilogram, mikina, gymnázium, chyža, pochytali ich, zakýval, nákyp, broskyňa, vykynožili, pokyny, kypriaci prášok, knihy, hrady, kyjak, hymna, kyslý, kysnuté cesto, kytica, chytľavá choroba, chrurg, mlieko, vykypelo, legíny, gitara, gýč, história, pohyb, zahynul, chytrý, jaskyňa, kýcha, chytačka, japonské kimono, magické číslo, chytil");
+        wordsSource.Add("pomaličky, list, listina, prelistoval, odliv, príliv, záliv, polica, polička, blízko, priblížil, hlina, hlinený, klinec, slina, kraslica, lipa, lipový čaj, metelica, brokolica, červené líca, lišajník, linajkový zošit, žehlička, ihličie, ľad sa blyští, číslo, číslica, slivka, listy, klinčeky, zablyslo sa, stojí blízko nás, kolibrík, paličky, konvalinky");
+        wordsSource.Add("kýblik, gýč, kyslé, nákyp, kimono, krídlo, kýchať, cesto nekysne, kyslá kapusta, ryžový nákyp");
 
         OnSelected(new ChangeEventArgs() { Value = "0" } );
 
@@ -121,7 +148,14 @@
 
     private void ProcessAnswer(string answer)
     {
-        answersList.Add(new WordWithAnswer(wordsList[index], answer, display_word.IndexOf("_")));
+        var word = new WordWithAnswer(wordsList[index], answer, display_word.IndexOf("_"));
+
+        if (word.IsCorrect)
+            correctAnswers++;
+        else
+            incorrectAnswers++;
+
+        answersList.Add(word);
 
         if (index < wordsList.Count - 1)
             index++;
@@ -179,19 +213,8 @@
 
     }
 
-    private string CheckAnswer(WordWithAnswer word)
-    {
-        bool? isTrue = null;
 
-        if (word.Position < 0)
-            isTrue = null;
-        else
-            isTrue = (word.Word.Substring(word.Position, 1) == word.Answer);
 
-        if (isTrue is null) return "black";
-        else if ((bool)isTrue) return "#32CD32";
-        else return "red";
-    }
 
     private string GetAnswers()
     {
@@ -200,8 +223,7 @@
         for (int i = answersList.Count - 1; i >= 0; i--)
         {
             var word = answersList[i];
-            string strColor = CheckAnswer(word);
-            str += @$"<div style=""color: {strColor};"">{i+1}. {word.Word} {word.Answer}</div>";
+            str += @$"<div style=""color: {word.Color};"">{i+1}. {word.Word} {word.Answer}</div>";
         }
 
         return str;
