@@ -33,19 +33,20 @@
     <div class="@wordClass word" style="@wordStyle"><h1>@((MarkupString)display_word)</h1></div>
 
     <div style="height: 16px;" />
-    <button class="btn btn-answer @btnStyle" hidden="@(!showButtons)" @onclick="@(() => ProcessAnswer("i"))">i</button>
-    <button class="btn btn-answer @btnStyle" hidden="@(!showButtons)" @onclick="@(() => ProcessAnswer("í"))">í</button>
-    <button class="btn btn-answer @btnStyle" hidden="@(!showButtons)" @onclick="@(() => ProcessAnswer("y"))">y</button>
-    <button class="btn btn-answer @btnStyle" hidden="@(!showButtons)" @onclick="@(() => ProcessAnswer("ý"))">ý</button>
+    <button class="btn btn-answer @btnStyle[0]" hidden="@(!showButtons)" @onmousedown="@(() => ProcessAnswer(0, "i"))">i</button>
+    <button class="btn btn-answer @btnStyle[1]" hidden="@(!showButtons)" @onmousedown="@(() => ProcessAnswer(1, "í"))">í</button>
+    <button class="btn btn-answer @btnStyle[2]" hidden="@(!showButtons)" @onmousedown="@(() => ProcessAnswer(2, "y"))">y</button>
+    <button class="btn btn-answer @btnStyle[3]" hidden="@(!showButtons)" @onmousedown="@(() => ProcessAnswer(3, "ý"))">ý</button>
 
-    <button class="btn btn-answer btn-danger" hidden="@(!showResetButton)" @onclick="@(() => Reset())">Reset - od znova</button>
+    <button class="btn btn-answer btn-danger" hidden="@(!showResetButton)" @onmousedown="@(() => Reset())">Reset - od znova</button>
 
 </div>
 
 
 @code {
+    // private string btnStyle => (showButtons) ? "btn-primary" : "btn-secondary";
 
-    private string btnStyle => (showButtons) ? "btn-primary" : "btn-secondary";
+    private string[] btnStyle = new string[4] { "btn-primary", "btn-primary", "btn-primary", "btn-primary" } ;
 
     private class WordWithAnswer
     {
@@ -138,11 +139,8 @@
         Reset();
     }
 
-    private string greenAnimation = @"animation: greenAnimation ease 1s; animation-iteration-count: 1; animation-fill-mode: forwards;";
 
-    private string redAnimation = @"animation: redAnimation ease 1s; animation-iteration-count: 1; animation-fill-mode: forwards;";
-
-    private async Task ProcessAnswer(string answer)
+    private async Task ProcessAnswer(int btnIndex, string answer)
     {
         var word = new WordWithAnswer(wordsList[index], answer, display_word.IndexOf("_"));
 
@@ -152,6 +150,8 @@
         {
             var pos = display_word.IndexOf("_");
             if (pos < 0) return;
+
+            btnStyle[btnIndex] = "btn-correct";
 
             display_word = wordsList[index].Substring(0, pos);
             display_word += "<span style=\"color: black; font-weight: 700;\">";
@@ -173,6 +173,8 @@
             var pos = display_word.IndexOf("_");
             if (pos < 0) return;
 
+            btnStyle[btnIndex] = "btn-incorrect";
+
             display_word = wordsList[index].Substring(0, pos);
             display_word += "<span style=\"color: yellow; font-weight: 700;\">";
             display_word += wordsList[index].Substring(pos, 1);
@@ -189,6 +191,7 @@
             // wordStyle = "background: white;" + redAnimation;
         }
 
+        btnStyle[btnIndex] = "btn-primary";
 
         answersList.Add(word);
 

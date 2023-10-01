@@ -26,6 +26,14 @@
     transform: scale(1.1, 1.1);
 }
 
+.btn-correct {
+    background: #32CD32;
+}
+
+.btn-incorrect {
+    background: red;
+}
+
 .word {
     /*width: 500px;*/
 
